@@ -1,6 +1,7 @@
 from textblob import TextBlob
 from myapp.util.FetchTweets import FetchData
 import re
+from myapp.models import Tweet
 
 
 class Analyzer():
@@ -20,6 +21,7 @@ class Analyzer():
 
         if len(public_tweets) > 0:
             for tweet in public_tweets:
+				
                 tweet_dict = {}
 
                 analysis = TextBlob(self.clean_tweet(tweet.text))
@@ -38,6 +40,10 @@ class Analyzer():
                 tweet_dict['polarity'] = pol
 
                 final_list.append(tweet_dict)
+                
+                # adding into sqlite database
+                tweet = Tweet(created_date=tweet.created_at,user=tweet.user.name,text=tweet.text, coordinates=tweet.coordinates)
+                tweet.save()
 
         total = pos + neg + net
         if total == 0:
